@@ -1,0 +1,53 @@
+== youtube-troll-classifier
+
+This is a bayesian classifier of online comments. It was trained with youtube comments , but it could be used on any online commenting system. It is not affiliated in any way with Youtube.com or google.
+
+It is an implementation of Paul Graham's algorithms and techniques for classifying spam: http://www.paulgraham.com/spam.html
+
+== The training data 
+
+Using the youtube api I trained the classifier with about 30,000 youtube comments. The api tells you whether a certain comment has been marked as spam or not by other youtube users.
+
+== Usage
+
+spamcheck.py is the main tool here. If you give it a comment via stdin it will give you the probability that the comment is spam. Probabilities are between 0 and 1.0.
+
+    $ echo "Go to my youtube page and check out my videos" | ./spamcheck.py 
+    0.999964931472
+    $ echo "Great video! Loved it" | ./spamcheck.py
+    0.222768242843
+    $ echo "Please go to my webpage and buy my software" | ./spamcheck.py
+    0.997404774789
+    $ echo "worst video ever" | ./spamcheck.py
+    0.338513134698
+
+== Performance
+
+I ran the classifier on 3 popular videos outside of the ones I used to do the training.
+Here were the results:
+
+    total comments: 2936
+    Spams: 434
+    Not spams: 2502
+    Marked as spam: 417
+    Marked as notspam: 2519
+    False positives: 153
+    False negatives: 170
+
+So it caught 65% of spams with a 5% false positive rate
+Not very good. Not very good at all.
+
+You can kind of dial these values around. By modifying the thresholds I was able to get up to 75% of spams caught, but at the cost of a 15% false positive rate.
+
+== Possible improvements
+
+The data is really fuzzy... the 'spam' comments are ones that youtube users mark as spam. 
+So sometimes they will miss a comment that is spam, sometimes they will mark as spam a comment that is really just a troll, sometimes the trolls will mark a legit comment as spam. If I went through all of the comments and manually marked spam vs not spam I could have some better training data as well as better data with which to score the classifier.
+
+Use capitalization data - right now I convert everything to lowercase. But anecdotally it seems like spams have a higher chance of being in all caps.
+
+Use punctuation - the classifier doesn't really use punctuation, this is most likely a mistake because spams seem to have a lot of weird punctuation and ascii art.
+
+Search for keywords - just tokenizing the comment isn't the best because a lot of spam comments look like "pleasecheckoutmyfacebookpageatwwwfacebookcom/blah"
+
+
